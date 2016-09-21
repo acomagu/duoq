@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html manifest="duoq.appcache" ng-app="duoq">
+<head>
+<title>DUO3.0</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta charset="utf-8" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="apple-touch-icon-precomposed apple-touch-icon" href="/app/duoq/apple-touch-icon-precomposed.png" />
+<link rel="apple-touch-icon-precomposed apple-touch-icon" sizes="144x144" href="apple-touch-icon-144x144.png" />
+<style>
+@font-face {
+  font-family: 'icomoon';
+  src: url('icomoon.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+html, body {
+  height: 100%;
+}
+/** {
+  border: solid 1px black;
+  box-sizing: border-box;
+}*/
+:root {
+  --card-height: 100px;
+  --card-margin-lr: 2em;
+}
+body {
+  background: #ccc;
+  -webkit-text-size-adjust: 100%;
+  display: flex;
+  display: -webkit-flex;
+  align-items: center;
+}
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  background: #fff;
+  padding-top: 30vh;
+  transition: opacity 1s linear;
+}
+.loading-invisible {
+  opacity: 0;
+}
+.loading-none {
+  display: none;
+}
+.loading > div {
+  text-align: center;
+}
+.loading-icon {
+  font-family: 'icomoon';
+  color:  #2cb22c;
+  font-size: 2em;
+  margin: 1em;
+}
+.loading-msg {
+  font-size: 0.8em;
+}
+.container {
+  width: 100%;
+  position: relative;
+  height: 30vw;
+}
+@media screen and (max-width: 500px) {
+  .container {
+    height: 40vw;
+  }
+}
+.question, .answer {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+}
+.answer {
+  z-index: 2;
+}
+.swiper-container {
+  width: 100%;
+  height: 30vw;
+}
+@media screen and (max-width: 500px) {
+  .swiper-container{
+    height: 40vw;
+  }
+}
+.swiper-wrapper {
+  background: transparent;
+  width: calc(100% * 3) !important;
+  height: 100%;
+}
+.swiper-slide {
+  width: calc(100% / 3 - 20vw);
+  margin: 0 10vw;
+  box-sizing: border-box;
+  height: 100%;
+}
+@media screen and (max-width: 500px) {
+  .swiper-slide {
+    width: calc(100% / 3);
+    margin: 0;
+  }
+}
+.answer-content {
+  background: #fff;
+  border-radius: 2vw;
+  box-shadow: 1px 1px 10vw #aaa;
+}
+.noshadow {
+  box-shadow: none;
+}
+.answer-content .awrap {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+.sj, .se {
+  font-size: 1em;
+}
+@media screen and (max-width: 500px) {
+  .sj, .se {
+    font-size: 0.9em;
+  }
+}
+.answer-green, .answer-red {
+  opacity: 0;
+  display: block;
+  position: absolute;
+  top: 0;
+  width: calc(100% / 3 - 20vw);
+  height: 30vw;
+  z-index: 1;
+  font-family: 'icomoon';
+  color: #fff;
+  font-size: 10vw;
+  line-height: 30vw;
+  border-radius: 2vw;
+}
+@media screen and (max-width: 500px) {
+  .answer-green, .answer-red {
+    width: calc(100% / 3);
+    height: 40vw;
+    line-height: 40vw;
+  }
+}
+.frontCv {
+  z-index: 3;
+}
+.answer-green {
+  background: #2cb22c;
+}
+.answer-red {
+  background: #f31;
+  text-align: right;
+}
+.question-content {
+  display: flex;
+  display: -webkit-flex;
+  background: #fff;
+  width: calc(100% - 20hv);
+  height: 30vw;
+  margin: 0 10vw;
+  box-sizing: border-box;
+  font-size: 2em;
+  color: #4169e1;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2vw;
+  box-shadow: 1px 1px 20px #aaa;
+}
+@media screen and (max-width: 500px) {
+  .question-content {
+    width: 100%;
+    height: 40vw;
+    margin: 0;
+  }
+}
+.q, .awrap > div {
+  text-align: center;
+  flex: none;
+  -webkit-flex: none;
+  padding: 0;
+}
+.wj {
+  color: #4169e1;
+  font-size: 1.3em;
+}
+#log {
+  display: none;
+  position: absolute;
+  background: #eef;
+  width: 500px;
+  overflow: scroll;
+  height: 100px;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/swiper/2.6.1/idangerous.swiper.css" />
+<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js"></script>
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/firebug-lite/1.4.0/firebug-lite.min.js"></script>-->
+<!--<script src="https://code.angularjs.org/1.3.6/angular-animate.min.js"></script>-->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-touch.js"></script>
+<script src="//cdn.jsdelivr.net/swiper/2.6.1/idangerous.swiper.min.js"></script>
+<script>
+addEventListener('error',function(e){alert(JSON.stringify(e));},false);
+
+function log(v) {
+  //document.querySelector("#log").innerText=document.querySelector("#log").innerText+JSON.stringify(v);
+  console.log(v);
+}
+
+function loadingmsg(msg) {
+  document.querySelector(".loading-msg").innerText = msg;
+}
+function loaded() {
+  document.querySelector(".loading").className = "loading loading-invisible";
+  document.querySelector(".loading").addEventListener("webkitTransitionEnd", function() {
+    document.querySelector(".loading").className = "loading loading-none";
+  });
+}
+
+var app = angular.module("duoq", []);
+app.controller("QuizCtrl", function($scope, $http) {
+  $scope.log = log;
+  window.addEventListener('load', function () {
+    loadingmsg("単語データ / 成績を読み込んでいます");
+    $scope.$apply(function() {
+      if(localStorage.duoVersion == 0.7 && localStorage.duos && localStorage.misses) {
+        $scope.duos = JSON.parse(localStorage.duos);
+        if(JSON.parse(localStorage.misses).length <= 50) {
+          $scope.misses = JSON.parse(localStorage.misses);
+        } else {
+          $scope.misses = JSON.parse(localStorage.misses).slice(0, 50);
+          localStorage.misses = JSON.stringify($scope.misses);
+        }
+        $scope.init();
+      } else {
+        //$http.get("https://api.myjson.com/bins/489tn").success(function(res) {
+        //$http.get("https://api.myjson.com/bins/meo3").success(function(res) {
+        $http.get("https://api.myjson.com/bins/ojtv").success(function(res) {
+          $scope.duos = res;
+          localStorage.duos = JSON.stringify(res);
+          localStorage.duoVersion = 0.7;
+          $scope.misses = [];
+          localStorage.misses = JSON.stringify([]);
+          $scope.init();
+        });
+      }
+    });
+  });
+  $scope.duos = [[]];
+  var n1 = 0, n2 = 0;
+  var flag;
+  var prevQ;
+  $scope.init = function() {
+    flag = true;
+    $scope.makeQ();
+    $scope.we = $scope.duos[n1][1][n2][1];
+    $scope.wj = $scope.duos[n1][1][n2][0];
+    $scope.se = $scope.duos[n1][0][1];
+    $scope.sj = $scope.duos[n1][0][0];
+    $scope.swiper.swipeTo(2, 0, false);
+    $scope.q = true;
+    loaded();
+  };
+  $scope.makeQ = function() {
+    if(Math.random() <= (3 / 10) && $scope.misses.length > 5) {
+      var n = Math.floor(Math.random() * ($scope.misses.length - 1));
+      n1 = $scope.misses[n][0];
+      n2 = $scope.misses[n][1];
+      log("Misses");
+    } else {
+      do {
+        n1 = Math.floor(Math.random() * ($scope.duos.length - 1));
+      } while($scope.duos[n1][1].length == 0);
+      n2 = Math.floor(Math.random() * ($scope.duos[n1][1].length - 1));
+      log("Randoms");
+    }
+  };
+  $scope.toA = function() {
+    if(flag) {
+      flag = false;
+      log("toA");
+      prevQ = [n1, n2];
+      $scope.makeQ();
+      $scope.we = $scope.duos[n1][1][n2][1];
+    }
+    $scope.swiper.swipeTo(1, 0, false);
+    $scope.diff = 0;
+    $scope.q = false;
+    //log("Section:" + $scope.duos[n1][0])
+    log([n1,n2]);
+  };
+  $scope.toQ = function() {
+    log("toQ");
+    flag = true;
+    $scope.wj = $scope.duos[n1][1][n2][0];
+    $scope.se = $scope.duos[n1][0][1];
+    $scope.sj = $scope.duos[n1][0][0];
+    log("qend");
+  };
+  $scope.load = function() {
+    $scope.swiper = new Swiper('.swiper-container', {
+      mode: 'horizontal',
+      speed: 400,
+      cssWidthAndHeight: true,
+      initialSlide: 1,
+      //eventTarget: 'container',
+      moveStartThreshold: 0,
+      noSwiping: true,
+      onTouchMove: function(swiper) {
+        $scope.$apply(function() {
+          $scope.diff = (JSON.stringify(swiper.touches.current - swiper.touches.start)) / (swiper.width * 0.7);
+        });
+      },
+      onSlideChangeStart: function() {
+       $scope.$apply(function() {
+         $scope.toQ();
+         $scope.q = true;
+       });
+      },
+      onSlideNext: function() {
+        $scope.$apply(function() {
+          $scope.diff = -1;
+          $scope.misses.unshift(prevQ);
+          localStorage.misses = JSON.stringify($scope.misses);
+          log($scope.misses);
+        });
+      },
+      onSlidePrev: function() {
+        $scope.$apply(function() {
+          $scope.diff = 1;
+        });
+      },
+      onSlideReset: function(swiper, d) {
+        $scope.$apply(function() {
+          $scope.diff = 0;
+        });
+      }
+    });
+  };
+});
+</script>
+</head>
+<body>
+<div class="loading">
+  <div class="loading-icon">&#xe601</div>
+  <div class="loading-label">読み込み中です...</div>
+  <div class="loading-msg">スクリプトを読み込んでいます</div>
+</div>
+<div id="log"></div>
+<div class="container" ng-controller="QuizCtrl">
+  <div class="question" ng-click="">
+    <div class="question-content">
+    <span class="q">{{we}}</span>
+    </div>
+  </div>
+  <div class="answer">
+    <div class="swiper-container" ng-init="load()">
+      <div class="swiper-wrapper" ng-class="{'swiper-no-swiping': q}">
+        <div class="swiper-slide" ng-class="{'swiper-no-swiping': q}" ng-click="log('11');toA();log('12')"></div>
+        <div class="swiper-slide answer-content" ng-class="{'swiper-no-swiping': q, 'noshadow': q}">
+          <div class="awrap">
+            <div class="wj">{{wj}}</div>
+            <div class="se">{{se}}</div>
+            <div class="sj">{{sj}}</div>
+          </div>
+          <div class="answer-green" ng-style="{opacity: diff}" ng-class="{'frontCv': !q}">&#xe601;</div>
+          <div class="answer-red" ng-style="{opacity: -diff}" ng-class="{'frontCv': !q}">&#xe600;</div>
+        </div>
+        <div class="swiper-slide" ng-class="{'swiper-no-swiping': q}" ng-click="log(21);toA();log(22);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
