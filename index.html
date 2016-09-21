@@ -194,6 +194,7 @@ body {
 .wj {
   color: #4169e1;
   font-size: 1.3em;
+  white-space: pre;
 }
 #log {
   display: none;
@@ -235,7 +236,7 @@ app.controller("QuizCtrl", function($scope, $http) {
   window.addEventListener('load', function () {
     loadingmsg("単語データ / 成績を読み込んでいます");
     $scope.$apply(function() {
-      if(localStorage.duoVersion == 0.7 && localStorage.duos && localStorage.misses) {
+      if(localStorage.duoVersion == 0.3 && localStorage.duos && localStorage.misses) {
         $scope.duos = JSON.parse(localStorage.duos);
         if(JSON.parse(localStorage.misses).length <= 50) {
           $scope.misses = JSON.parse(localStorage.misses);
@@ -247,7 +248,8 @@ app.controller("QuizCtrl", function($scope, $http) {
       } else {
         //$http.get("https://api.myjson.com/bins/489tn").success(function(res) {
         //$http.get("https://api.myjson.com/bins/meo3").success(function(res) {
-        $http.get("https://api.myjson.com/bins/ojtv").success(function(res) {
+        // $http.get("https://api.myjson.com/bins/ojtv").success(function(res) {
+          $http.get("komeda_hotmenu.json").success(function(res) {
           $scope.duos = res;
           localStorage.duos = JSON.stringify(res);
           localStorage.duoVersion = 0.7;
